@@ -2,6 +2,7 @@ package com.example.twoactivities
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.util.Log
 import android.view.View
 import android.widget.EditText
@@ -27,10 +28,34 @@ class MainActivity : AppCompatActivity() {
         mMessageEditText = findViewById(R.id.editText_main)
         mReplyHeadTextView = findViewById(R.id.text_header_reply)
         mReplyTextView = findViewById(R.id.text_message_reaply)
+
+        if (savedInstanceState != null) {
+            val isVisible = savedInstanceState.getBoolean("reply_visible")
+            if (isVisible) {
+                mReplyHeadTextView?.visibility = View.VISIBLE
+                mReplyTextView?.text = savedInstanceState.getString("reply_text")
+                mReplyTextView?.visibility = View.VISIBLE
+            }
+        }
+
+        Log.d(LOG_TAG, "-------")
+        Log.d(LOG_TAG, "onCreate")
+    }
+    override fun onStart() {
+        super.onStart()
+        Log.d(LOG_TAG, "onStart")
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        if (mReplyHeadTextView?.visibility == View.VISIBLE) {
+            outState.putBoolean("reply_visible", true)
+            outState.putString("reply_text",mReplyTextView?.text.toString())
+        }
     }
 
     fun launchSecondActivity(view: View) {
-        Log.d(LOG_TAG, "Button clicked!");
+        Log.d(LOG_TAG, "Button clicked!")
         val intent = Intent(this, SecondActivity::class.java)
         val message = mMessageEditText?.text.toString()
         intent.putExtra(EXTRA_MESSAGE, message)
